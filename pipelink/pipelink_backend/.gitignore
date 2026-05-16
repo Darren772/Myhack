@@ -1,6 +1,6 @@
 # ── Secrets ────────────────────────────────────────────────
 .env
-serviceAccountKey.json
+Myhack/pipelink/pipelink_backend/serviceAccountKey.json
 *.json
 !firebase.json
 !package.json
@@ -26,3 +26,4 @@ venv/
 # ── OS ────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
+
