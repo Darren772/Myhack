@@ -75,41 +75,49 @@ def _send_email(to_email: str, subject: str, body: str) -> bool:
 
 def send_join_confirmation(user_name: str, user_email: str, event: dict, role: str) -> bool:
     """
-    Send a confirmation email when a user joins via the PipeLink UI.
-    Uses the host's participant or sponsor email body verbatim,
-    only personalising {{name}}.
+    Send a fixed congratulations email when a user joins via the PipeLink UI.
+    Always uses the PipeLink confirmation template — not the host's email body.
     """
     if not user_email:
         return False
 
-    title = event.get("title", "the event")
+    title    = event.get("title", "the event")
+    date_raw = event.get("event_date", "")
+    role_label = "Sponsor" if role in ("sponsor", "investor") else "Participant"
+    form_url = (
+        event.get("investor_form_url", "") if role in ("sponsor", "investor")
+        else event.get("participant_form_url", "")
+    )
 
-    if role in ("sponsor", "investor"):
-        subject = event.get("investor_email_subject") or f"You're joining {title} as a Sponsor!"
-        body    = event.get("investor_email_body")    or (
-            f"Hi {user_name},\n\n"
-            f"You've successfully joined {title} as a sponsor.\n\n"
-            f"The host will be in touch with next steps.\n\nPipeLink"
-        )
-        form_url = event.get("investor_form_url", "")
+    # Format date nicely: "2026-06-15" → "15 June 2026"
+    if date_raw:
+        try:
+            from datetime import datetime
+            date_str = datetime.strptime(date_raw, "%Y-%m-%d").strftime("%d %B %Y")
+        except Exception:
+            date_str = date_raw
     else:
-        subject = event.get("participant_email_subject") or f"You're joining {title}!"
-        body    = event.get("participant_email_body")    or (
-            f"Hi {user_name},\n\n"
-            f"You've successfully joined {title}.\n\n"
-            f"The host will be in touch with next steps.\n\nPipeLink"
-        )
-        form_url = event.get("participant_form_url", "")
+        date_str = "TBA"
 
-    # Personalise name only; also fill form URL if host used placeholder
-    body = _personalise(body, user_name)
-    body = body.replace("{{participant_form_url}}", form_url)
-    body = body.replace("{{investor_form_url}}", form_url)
-    body = body.replace("{{event_title}}", title)
-    body = body.replace("{{event_date}}", event.get("event_date", "TBA"))
+    subject = f"Congratulations! You have joined {title}"
 
-    return _send_email(user_email, _personalise(subject, user_name), body)
+    body = (
+        f"Congratulations {user_name},\n\n"
+        f"You have successfully joined {title} as a {role_label}!\n\n"
+        f"Event Date : {date_str}\n"
+        f"Your Role  : {role_label}\n"
+    )
+    if form_url:
+        body += f"Next Step  : Complete your registration at {form_url}\n"
 
+    body += (
+        f"\nWe look forward to seeing you there!\n\n"
+        f"Best regards,\n"
+        f"The PipeLink Team\n"
+        f"https://pipelink.dev"
+    )
+
+    return _send_email(user_email, subject, body)
 
 # ── main broadcast ────────────────────────────────────────────────────────────
 
