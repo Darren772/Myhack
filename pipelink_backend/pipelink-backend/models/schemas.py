@@ -21,7 +21,7 @@ class UserProfile(BaseModel):
     skills: list[str] = Field(default_factory=list)
     education: list[dict] = Field(default_factory=list)
     experience: list[dict] = Field(default_factory=list)
-    active_personas: list[str] = Field(default_factory=list)   # subset of PERSONA_CHOICES
+    active_personas: list[str] = Field(default_factory=list)
     embedding_vector: list[float] = Field(default_factory=list)
 
 
@@ -56,58 +56,51 @@ class Relationship(BaseModel):
     notes: str = ""
 
 
-class MatchedProfile(BaseModel):
-    """A single investor / mentor match returned by the matcher."""
-    uid: str
-    name: str
+# ── 1. Parse LinkedIn ─────────────────────────────────────────────────
+class ParseLinkedInRequest(BaseModel):
+    text: str = Field(..., description="Raw LinkedIn profile text pasted by the user.")
+
+class ParseLinkedInResponse(BaseModel):
+    name: str = ""
     bio: str = ""
-    active_personas: list[str] = Field(default_factory=list)
-    similarity_score: float = 0.0
-    explanation: str = ""                   # plain-English from the recommender
-
-
-# ── 1. LinkedIn parse ─────────────────────────────────────────────────
-class LinkedInParseRequest(BaseModel):
-    raw_text: str = Field(..., description="Raw LinkedIn profile text pasted by the user.")
-
-class LinkedInParseResponse(BaseModel):
-    profile: UserProfile
+    skills: list[str] = Field(default_factory=list)
+    education: list[str] = Field(default_factory=list)
+    experience: list[str] = Field(default_factory=list)
 
 
 # ── 2. Form sync ──────────────────────────────────────────────────────
-class FormSyncPayload(BaseModel):
+class FormSyncRequest(BaseModel):
     """Payload sent from a Google Apps Script on form submit."""
-    form_fields: dict = Field(..., description="Arbitrary key-value pairs from the form.")
-    event_name: Optional[str] = None
-    timestamp: Optional[str] = None
-
-class FormSyncResponse(BaseModel):
-    uid: str
-    profile: UserProfile
+    user_email: str
+    event_name: str
+    form_id: str
+    fields: dict = Field(..., description="Arbitrary key-value pairs from the form.")
 
 
 # ── 3. Embed profile ──────────────────────────────────────────────────
-class ProfileEmbedRequest(BaseModel):
+class EmbedProfileRequest(BaseModel):
     uid: str
-
-class ProfileEmbedResponse(BaseModel):
-    uid: str
-    embedding_dim: int
-    stored: bool = True
 
 
 # ── 4. Investor match ─────────────────────────────────────────────────
 class MatchRequest(BaseModel):
     query: str = Field(..., description="Natural-language search query.")
-    top_k: int = Field(default=5, ge=1, le=20)
+
+class MatchResult(BaseModel):
+    uid: str
+    name: str = ""
+    match_score: float = 0.0
+    explanation: str = ""
+    skills: list[str] = Field(default_factory=list)
+    engagement_count: int = 0
 
 class MatchResponse(BaseModel):
-    matches: list[MatchedProfile]
+    results: list[MatchResult]
 
 
 # ── 5. Journey summary ────────────────────────────────────────────────
-class JourneySummaryRequest(BaseModel):
+class JourneyRequest(BaseModel):
     uid: str
 
-class JourneySummaryResponse(BaseModel):
+class JourneyResponse(BaseModel):
     summary: str

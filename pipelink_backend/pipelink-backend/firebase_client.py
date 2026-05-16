@@ -2,7 +2,11 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 import os
 
-cred = credentials.Certificate(os.getenv("FIREBASE_SERVICE_ACCOUNT_PATH"))
+cred_path = os.getenv("FIREBASE_SERVICE_ACCOUNT_PATH")
+if not cred_path:
+    raise ValueError("FIREBASE_SERVICE_ACCOUNT_PATH environment variable is not set")
+
+cred = credentials.Certificate(cred_path)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
