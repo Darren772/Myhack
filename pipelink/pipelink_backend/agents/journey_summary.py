@@ -1,9 +1,9 @@
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 import os
 from firebase_client import get_user, get_engagements, get_relationships
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel("gemini-3.1-flash-lite")
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 def generate_journey(uid: str) -> str:
     profile = get_user(uid)
@@ -32,8 +32,9 @@ Events attended:
 Relationships:
 {rel_str or "None recorded yet"}"""
 
-    response = model.generate_content(
-        prompt,
-        generation_config=genai.GenerationConfig(temperature=0.5)
+    response = client.models.generate_content(
+        model="gemini-2.5-flash-lite",
+        contents=prompt,
+        config=types.GenerateContentConfig(temperature=0.5)
     )
     return response.text.strip()

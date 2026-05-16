@@ -1,8 +1,8 @@
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 import json, os
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel("gemini-3.1-flash-lite")
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 def parse_linkedin(text: str) -> dict:
     prompt = f"""You are a profile parser. Extract structured data from this LinkedIn profile text.
@@ -15,9 +15,10 @@ No markdown, no explanation, no code blocks. Pure JSON only.
 LinkedIn text:
 {text}"""
 
-    response = model.generate_content(
-        prompt,
-        generation_config=genai.GenerationConfig(temperature=0.1)
+    response = client.models.generate_content(
+        model="gemini-2.5-flash-lite",
+        contents=prompt,
+        config=types.GenerateContentConfig(temperature=0.1)
     )
 
     raw = response.text.strip()

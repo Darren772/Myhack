@@ -1,8 +1,8 @@
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 import os
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel("gemini-3.1-flash-lite")
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 def explain_match(query: str, profile: dict, score: float) -> str:
     """Generate a plain-English explanation of why a single profile matches the query."""
@@ -26,8 +26,9 @@ Profile:
 
 Return ONLY the explanation text, no JSON, no markdown."""
 
-    response = model.generate_content(
-        prompt,
-        generation_config=genai.GenerationConfig(temperature=0.3)
+    response = client.models.generate_content(
+        model="gemini-2.5-flash-lite",
+        contents=prompt,
+        config=types.GenerateContentConfig(temperature=0.3)
     )
     return response.text.strip()

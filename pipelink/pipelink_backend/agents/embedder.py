@@ -1,8 +1,9 @@
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 import os
 from firebase_client import get_user, update_user
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 def embed_profile(uid: str) -> list[float]:
     profile = get_user(uid)
@@ -14,21 +15,19 @@ def embed_profile(uid: str) -> list[float]:
     experience_str = " | ".join([str(e) for e in profile.get("experience", [])])
     text = f"{profile.get('name', '')}. {profile.get('bio', '')}. Skills: {skills_str}. Experience: {experience_str}"
 
-    result = genai.embed_content(
-        model="models/text-embedding-004",
-        content=text,
-        task_type="RETRIEVAL_DOCUMENT"
+    result = client.models.embed_content(
+        model="gemini-embedding-001",
+        contents=text,
     )
-    embedding = result["embedding"]
+    embedding = result.embeddings[0].values
 
     # Save back to Firestore
     update_user(uid, {"embedding_vector": embedding})
     return embedding
 
 def embed_query(query: str) -> list[float]:
-    result = genai.embed_content(
-        model="models/text-embedding-004",
-        content=query,
-        task_type="RETRIEVAL_QUERY"
+    result = client.models.embed_content(
+        model="gemini-embedding-001",
+        contents=query,
     )
-    return result["embedding"]
+    return result.embeddings[0].values

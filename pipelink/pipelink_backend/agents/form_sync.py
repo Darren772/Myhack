@@ -1,10 +1,10 @@
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 import json, os
 from firebase_client import get_user_by_email, update_user, create_engagement
 from datetime import datetime, timezone
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel("gemini-3.1-flash-lite")
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 def sync_form(user_email: str, event_name: str, form_id: str, fields: dict) -> dict:
     prompt = f"""Map these Google Form fields to this profile schema.
@@ -13,9 +13,10 @@ Form fields: {json.dumps(fields)}
 Return ONLY valid JSON with matching keys. Ignore unmappable fields.
 No markdown, no explanation."""
 
-    response = model.generate_content(
-        prompt,
-        generation_config=genai.GenerationConfig(temperature=0.1)
+    response = client.models.generate_content(
+        model="gemini-2.5-flash-lite",
+        contents=prompt,
+        config=types.GenerateContentConfig(temperature=0.1)
     )
     raw = response.text.strip()
     if raw.startswith("```"):

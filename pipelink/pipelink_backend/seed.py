@@ -4,12 +4,13 @@ load_dotenv()
 
 import firebase_admin
 from firebase_admin import credentials, firestore
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 cred = credentials.Certificate(os.getenv("FIREBASE_SERVICE_ACCOUNT_PATH"))
 firebase_admin.initialize_app(cred)
 db = firestore.client()
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 PROFILES = [
     {"name": "Aisha Razak", "bio": "Founder of a fintech startup automating SME payroll in Malaysia.", "skills": ["Python", "Django", "Stripe API", "Fintech"], "education": ["BSc Computer Science, UM, 2021"], "experience": ["SWE at CIMB 2021-2023", "Founder at PayEasy 2023-present"], "active_personas": ["founder"]},
@@ -37,14 +38,17 @@ def build_embedding_text(p):
     return f"{p['name']}. {p['bio']} Skills: {', '.join(p['skills'])}. Experience: {' | '.join(p['experience'])}"
 
 def embed(text):
-    result = genai.embed_content(model="models/text-embedding-004", content=text, task_type="RETRIEVAL_DOCUMENT")
-    return result["embedding"]
+    result = client.models.embed_content(
+        model="gemini-embedding-001",
+        contents=text,
+    )
+    return result.embeddings[0].values
 
 def seed():
     # Seed events
     for event in EVENTS:
         db.collection("events").document(event["event_id"]).set(event)
-    print("✅ Events seeded")
+    print("[OK] Events seeded")
 
     # Seed profiles
     for i, p in enumerate(PROFILES):
@@ -64,9 +68,9 @@ def seed():
                 "check_in_at": "2024-11-01T09:00:00",
                 "outcomes": "Completed project submission"
             })
-        print(f"✅ Seeded: {p['name']}")
+        print(f"[OK] Seeded: {p['name']}")
 
-    print("\n🎉 All profiles seeded with embeddings!")
+    print("\n[DONE] All profiles seeded with embeddings!")
 
 if __name__ == "__main__":
     seed()
