@@ -5,3 +5,6 @@ firebase-admin
 python-dotenv
 pydantic
 numpy
+requests
+beautifulsoup4
+lxml

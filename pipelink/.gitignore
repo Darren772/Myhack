@@ -1,0 +1,14 @@
+# ── Shared env (gitignore from root) ──────────────────────
+.env
+.env.local
+*.env
+
+# ── Backend ───────────────────────────────────────────────
+pipelink_backend/__pycache__/
+pipelink_backend/*.pyc
+pipelink_backend/serviceAccountKey.json
+
+# ── Frontend ──────────────────────────────────────────────
+pipelink_frontend/node_modules/
+pipelink_frontend/.next/
+pipelink_frontend/.env.local

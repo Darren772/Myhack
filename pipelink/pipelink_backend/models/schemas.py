@@ -104,3 +104,61 @@ class JourneyRequest(BaseModel):
 
 class JourneyResponse(BaseModel):
     summary: str
+
+
+# ── 6. Event Hosting & Broadcasting ───────────────────────────────────
+class CreateEventRequest(BaseModel):
+    host_uid: str = Field(..., description="UID of the user hosting the event.")
+    title: str = Field(..., description="Event title.")
+    description: str = Field(..., description="Full event description used for AI matching.")
+    industry: str = Field("", description="Industry/domain e.g. Fintech, EdTech, HealthTech.")
+    event_date: Optional[str] = Field(None, description="ISO date string e.g. 2025-09-01")
+    needed_investors: int = Field(5, description="How many investors to invite.")
+    needed_participants: int = Field(20, description="How many participants to invite.")
+    # Preset fields
+    participant_form_url: str = Field("", description="Google Form URL for participants.")
+    investor_form_url: str = Field("", description="Google Form URL for investors/companies.")
+    participant_email_subject: str = Field("", description="Email subject for participant outreach.")
+    participant_email_body: str = Field("", description="Email body template for participants.")
+    investor_email_subject: str = Field("", description="Email subject for investor outreach.")
+    investor_email_body: str = Field("", description="Email body template for investors.")
+
+class LaunchEventRequest(BaseModel):
+    top_investors: int = Field(5)
+    top_participants: int = Field(20)
+
+
+class CreateEventResponse(BaseModel):
+    event_id: str
+    title: str
+    message: str = ""
+
+class BroadcastRequest(BaseModel):
+    event_id: str = Field(..., description="ID of the hosted event to broadcast.")
+    top_investors: int = Field(5, description="Max number of investors to invite.")
+    top_participants: int = Field(20, description="Max number of participants to invite.")
+
+class BroadcastResult(BaseModel):
+    event_id: str
+    investors_invited: int
+    participants_invited: int
+    total_invited: int
+
+class InvitationItem(BaseModel):
+    event_id: str = ""
+    event_title: str = ""
+    user_uid: str = ""
+    user_name: str = ""
+    user_email: str = ""
+    compatibility_score: float = 0.0
+    role_matched: str = ""
+    status: str = "pending"
+    created_at: str = ""
+
+class EventInvitesResponse(BaseModel):
+    event_id: str
+    invitations: list[InvitationItem]
+
+class UserInvitesResponse(BaseModel):
+    uid: str
+    invitations: list[InvitationItem]
