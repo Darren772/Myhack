@@ -109,7 +109,7 @@ function InviteListContent() {
         <Link href="/feed" style={{ color: "#64748b", fontSize: "0.875rem" }}>← Feed</Link>
         <div style={{ flex: 1 }} />
         <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
-          <div style={{ width: "32px", height: "32px", borderRadius: "9px", background: "linear-gradient(135deg,#7c3aed,#06b6d4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px" }}>⚡</div>
+          <img src="/logo.png" alt="PipeLink" style={{ width: "32px", height: "32px", borderRadius: "9px", objectFit: "cover" }} />
           <span style={{ fontWeight: 700, fontSize: "1.05rem", color: "#f1f5f9" }}>PipeLink</span>
         </div>
       </nav>

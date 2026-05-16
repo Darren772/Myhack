@@ -100,8 +100,9 @@ export default function CreateEventPage() {
   function applyPreset(p: any) {
     setForm(f => ({
       ...f,
-      industry: p.industry || f.industry,
-      needed_participants: p.needed_participants || f.needed_participants,
+      description: p.description ?? f.description,
+      industry: p.industry ?? f.industry,
+      needed_participants: p.needed_participants ?? f.needed_participants,
       participant_form_url: p.participant_form_url || f.participant_form_url,
       investor_form_url: p.investor_form_url || f.investor_form_url,
       participant_email_subject: p.participant_email_subject || f.participant_email_subject,
@@ -117,11 +118,21 @@ export default function CreateEventPage() {
   async function doSavePreset() {
     if (!presetName.trim() || !user) return;
     setSavingPreset(true);
-    await apiFetch("POST", `/user/${user.uid}/presets`, {
+    const { ok, data } = await apiFetch("POST", `/user/${user.uid}/presets`, {
       name: presetName.trim(),
       ...form,
       needed_participants: Number(form.needed_participants),
     });
+    if (ok) {
+      setPresets(prev => [...prev, {
+        preset_id: data.preset_id,
+        host_uid: user.uid,
+        name: presetName.trim(),
+        description: form.description,
+        industry: form.industry,
+        needed_participants: Number(form.needed_participants),
+      }]);
+    }
     setSavingPreset(false);
     setShowSaveModal(false);
     setPresetName("");
@@ -249,7 +260,7 @@ export default function CreateEventPage() {
         <Link href="/feed" style={{ color: "#64748b", fontSize: "0.875rem" }}>← Back to Feed</Link>
         <div style={{ flex: 1 }} />
         <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
-          <div style={{ width: "32px", height: "32px", borderRadius: "9px", background: "linear-gradient(135deg,#7c3aed,#06b6d4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px" }}>⚡</div>
+          <img src="/logo.png" alt="PipeLink" style={{ width: "32px", height: "32px", borderRadius: "9px", objectFit: "cover" }} />
           <span style={{ fontWeight: 700, fontSize: "1.05rem", color: "#f1f5f9" }}>PipeLink</span>
         </div>
       </nav>
@@ -337,13 +348,34 @@ export default function CreateEventPage() {
                   <textarea className="field-textarea" value={form.description} onChange={e => set("description", e.target.value)} rows={5}
                     placeholder="Describe your event — the theme, what attendees will experience, what kind of investors and participants you're looking for, and the expected impact." />
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1.25rem" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", marginBottom: "1.25rem" }}>
                   <div>
                     <label className="field-label">Industry</label>
-                    <select className="field-input" value={form.industry} onChange={e => set("industry", e.target.value)} style={{ cursor: "pointer" }}>
-                      <option value="">Select industry</option>
-                      {INDUSTRIES.map(i => <option key={i}>{i}</option>)}
-                    </select>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginTop: "0.4rem" }}>
+                      {INDUSTRIES.map(i => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => set("industry", form.industry === i ? "" : i)}
+                          style={{
+                            padding: "0.4rem 0.85rem",
+                            borderRadius: "999px",
+                            border: form.industry === i ? "1px solid rgba(124,58,237,0.7)" : "1px solid rgba(255,255,255,0.1)",
+                            background: form.industry === i ? "rgba(124,58,237,0.25)" : "rgba(255,255,255,0.04)",
+                            color: form.industry === i ? "#c4b5fd" : "#64748b",
+                            fontSize: "0.78rem",
+                            fontWeight: form.industry === i ? 700 : 500,
+                            cursor: "pointer",
+                            fontFamily: "inherit",
+                            transition: "all 0.15s",
+                          }}
+                          onMouseEnter={e => { if (form.industry !== i) e.currentTarget.style.borderColor = "rgba(124,58,237,0.4)"; }}
+                          onMouseLeave={e => { if (form.industry !== i) e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}
+                        >
+                          {i}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   <div>
                     <label className="field-label">Event Date</label>

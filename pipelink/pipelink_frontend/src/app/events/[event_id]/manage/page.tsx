@@ -124,6 +124,28 @@ export default function ManageEventPage() {
               )}
             </div>
           </div>
+
+          {/* Email delivery report */}
+          {event?.email_report && (
+            <div style={{ marginTop: "1rem", padding: "0.85rem 1.25rem", borderRadius: "12px", background: event.email_report.dry_run ? "rgba(251,191,36,0.06)" : "rgba(16,185,129,0.06)", border: `1px solid ${event.email_report.dry_run ? "rgba(251,191,36,0.2)" : "rgba(16,185,129,0.2)"}`, display: "flex", alignItems: "center", gap: "1.5rem", flexWrap: "wrap" }}>
+              <span style={{ fontSize: "0.78rem", fontWeight: 700, color: event.email_report.dry_run ? "#fbbf24" : "#34d399" }}>
+                {event.email_report.dry_run ? "⚠ Email Dry-Run Mode" : "📧 Emails Sent"}
+              </span>
+              <span style={{ fontSize: "0.75rem", color: "#94a3b8" }}>✅ {event.email_report.sent} sent</span>
+              {event.email_report.failed > 0 && <span style={{ fontSize: "0.75rem", color: "#f87171" }}>❌ {event.email_report.failed} failed</span>}
+              <span style={{ fontSize: "0.75rem", color: "#64748b" }}>👥 {event.email_report.total} matched</span>
+              {event.email_report.dry_run && (
+                <span style={{ fontSize: "0.7rem", color: "#a16207", marginLeft: "auto" }}>
+                  Set GMAIL_USER + GMAIL_APP_PASSWORD in .env to send real emails
+                </span>
+              )}
+              {event.email_report.sent_at && (
+                <span style={{ fontSize: "0.68rem", color: "#475569", marginLeft: "auto" }}>
+                  Last run: {new Date(event.email_report.sent_at).toLocaleString()}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

@@ -131,7 +131,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer style={{ position: "relative", zIndex: 1, borderTop: "1px solid rgba(255,255,255,0.06)", padding: "1.5rem 2rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <div style={{ width: "24px", height: "24px", borderRadius: "6px", background: "linear-gradient(135deg,#7c3aed,#06b6d4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px" }}>⚡</div>
+          <img src="/logo.png" alt="PipeLink" style={{ width: "24px", height: "24px", borderRadius: "6px", objectFit: "cover" }} />
           <span style={{ fontWeight: 700, fontSize: "0.9rem", color: "#475569" }}>PipeLink</span>
         </div>
         <span style={{ fontSize: "0.75rem", color: "#334155" }}>© 2025 PipeLink. All rights reserved.</span>

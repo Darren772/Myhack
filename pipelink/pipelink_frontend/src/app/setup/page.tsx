@@ -84,7 +84,7 @@ const INTEREST_OPTIONS = ["AI / Tech","Fintech","EdTech","HealthTech","Climate T
     }}>
       <div className="animate-fadein" style={{ width: "100%", maxWidth: "520px" }}>
         <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "48px", height: "48px", borderRadius: "14px", background: "linear-gradient(135deg,#7c3aed,#06b6d4)", marginBottom: "0.75rem", fontSize: "20px" }}>⚡</div>
+          <img src="/logo.png" alt="PipeLink" style={{ width: "48px", height: "48px", borderRadius: "14px", objectFit: "cover", marginBottom: "0.75rem" }} />
           <h1 style={{ fontSize: "1.5rem", fontWeight: 800, color: "#f1f5f9" }}>Set up your profile</h1>
           <p style={{ color: "#64748b", fontSize: "0.875rem", marginTop: "0.25rem" }}>Step {step} of 3 — {step === 1 ? "Basic Info" : step === 2 ? "LinkedIn" : "Interests"}</p>
         </div>

@@ -140,13 +140,17 @@ def get_event_join_count(event_id: str) -> int:
 # ── Event Presets ──────────────────────────────────────────
 def get_user_presets(host_uid: str) -> list[dict]:
     docs = db.collection("event_presets").where("host_uid", "==", host_uid).stream()
-    results = [{"preset_id": doc.id, **doc.to_dict()} for doc in docs]
+    # Put doc.to_dict() FIRST so that doc.id always overwrites any stale preset_id stored in the document body
+    results = [{**doc.to_dict(), "preset_id": doc.id} for doc in docs]
     results.sort(key=lambda x: x.get("use_count", 0), reverse=True)
     return results
 
 def create_preset(data: dict) -> str:
     ref = db.collection("event_presets").add(data)
-    return ref[1].id
+    doc_id = ref[1].id
+    # Write the real ID back into the document so it's self-consistent
+    db.collection("event_presets").document(doc_id).update({"preset_id": doc_id})
+    return doc_id
 
 def update_preset(preset_id: str, data: dict):
     db.collection("event_presets").document(preset_id).set(data, merge=True)
@@ -156,4 +160,4 @@ def delete_preset(preset_id: str):
 
 def get_preset(preset_id: str) -> dict | None:
     doc = db.collection("event_presets").document(preset_id).get()
-    return {"preset_id": doc.id, **doc.to_dict()} if doc.exists else None
+    return {**doc.to_dict(), "preset_id": doc.id} if doc.exists else None

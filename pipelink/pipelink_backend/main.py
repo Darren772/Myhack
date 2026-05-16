@@ -509,6 +509,19 @@ async def join_event(event_id: str, req: dict):
         "form_url_opened": True,
     }
     join_id = create_event_join(join_doc)
+
+    # Send confirmation email to the joiner (uses host's exact email body)
+    try:
+        from agents.event_broadcaster import send_join_confirmation
+        send_join_confirmation(
+            user_name=join_doc["display_name"],
+            user_email=join_doc["email"],
+            event=event,
+            role=role,
+        )
+    except Exception as mail_err:
+        print(f"[JOIN EMAIL] Could not send confirmation: {mail_err}")
+
     return {"success": True, "already_joined": False, "join_id": join_id}
 
 @app.get("/user/{uid}/history")
@@ -568,6 +581,7 @@ async def save_preset(uid: str, req: dict):
         "preset_id": "",  # will be overwritten below
         "host_uid": uid,
         "name": name,
+        "description": req.get("description", ""),
         "industry": req.get("industry", ""),
         "needed_participants": req.get("needed_participants", 50),
         "participant_form_url": req.get("participant_form_url", ""),

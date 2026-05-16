@@ -5,7 +5,7 @@ import { apiFetch } from "@/lib/api";
 import Link from "next/link";
 
 type Preset = {
-  preset_id: string; name: string; industry: string;
+  preset_id: string; name: string; description: string; industry: string;
   needed_participants: number; participant_form_url: string;
   investor_form_url: string; participant_email_subject: string;
   participant_email_body: string; investor_email_subject: string;
@@ -86,6 +86,7 @@ export default function PresetsPage() {
             <h2 style={{ fontWeight: 800, color: "#f1f5f9", fontSize: "1.1rem", marginBottom: "1.5rem" }}>Edit Preset</h2>
             {[
               { label: "Preset Name *", key: "name", type: "text" },
+              { label: "Event Description", key: "description", type: "text" },
               { label: "Participant Form URL", key: "participant_form_url", type: "url" },
               { label: "★ Sponsor Form URL", key: "investor_form_url", type: "url" },
               { label: "Participant Email Subject", key: "participant_email_subject", type: "text" },
@@ -93,8 +94,13 @@ export default function PresetsPage() {
             ].map(({ label, key, type }) => (
               <div key={key} style={{ marginBottom: "1rem" }}>
                 <label style={{ fontSize: "0.72rem", color: "#94a3b8", fontWeight: 600, display: "block", marginBottom: "0.3rem" }}>{label}</label>
-                <input type={type} value={(editing as any)[key] || ""} onChange={e => setField(key as keyof Preset, e.target.value)}
-                  style={{ width: "100%", padding: "0.6rem 0.85rem", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#f1f5f9", fontSize: "0.85rem", fontFamily: "inherit", boxSizing: "border-box" }} />
+                {key === "description" ? (
+                  <textarea rows={3} value={(editing as any)[key] || ""} onChange={e => setField(key as keyof Preset, e.target.value)}
+                    style={{ width: "100%", padding: "0.6rem 0.85rem", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#f1f5f9", fontSize: "0.85rem", fontFamily: "inherit", resize: "vertical", boxSizing: "border-box" }} />
+                ) : (
+                  <input type={type} value={(editing as any)[key] || ""} onChange={e => setField(key as keyof Preset, e.target.value)}
+                    style={{ width: "100%", padding: "0.6rem 0.85rem", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", color: "#f1f5f9", fontSize: "0.85rem", fontFamily: "inherit", boxSizing: "border-box" }} />
+                )}
               </div>
             ))}
             <div style={{ marginBottom: "1rem" }}>
@@ -136,7 +142,7 @@ export default function PresetsPage() {
         <div style={{ flex: 1 }} />
         <Link href="/events/new" style={{ padding: "0.45rem 1rem", background: "linear-gradient(135deg,#7c3aed,#6d28d9)", color: "#fff", borderRadius: "8px", fontSize: "0.8rem", fontWeight: 600 }}>+ New Event</Link>
         <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
-          <div style={{ width: "32px", height: "32px", borderRadius: "9px", background: "linear-gradient(135deg,#7c3aed,#06b6d4)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px" }}>⚡</div>
+          <img src="/logo.png" alt="PipeLink" style={{ width: "32px", height: "32px", borderRadius: "9px", objectFit: "cover" }} />
           <span style={{ fontWeight: 700, fontSize: "1.05rem", color: "#f1f5f9" }}>PipeLink</span>
         </div>
       </nav>

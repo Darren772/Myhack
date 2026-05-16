@@ -177,9 +177,7 @@ function EventCard({
       </div>
 
       <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#f1f5f9", marginBottom: "0.5rem", lineHeight: 1.3 }}>{event.title}</h3>
-      <p style={{ fontSize: "0.825rem", color: "#94a3b8", lineHeight: 1.6, marginBottom: "1rem", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden", flex: 1 }}>
-        {event.description}
-      </p>
+
 
       {joinCount > 0 && (
         <div style={{ fontSize: "0.72rem", color: "#64748b", marginBottom: "0.75rem" }}>
@@ -234,13 +232,17 @@ export default function FeedPage() {
   const [search, setSearch] = useState("");
   const [filterIndustry, setFilterIndustry] = useState("");
 
-  const INDUSTRIES = ["AI / Tech","Fintech","EdTech","HealthTech","F&B","Climate Tech","Agri-Tech"];
+  const INDUSTRIES = ["AI / Tech", "Fintech", "EdTech", "HealthTech", "F&B", "Climate Tech", "Agri-Tech"];
+
+  const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
 
   const filteredEvents = events.filter(ev => {
     const q = search.toLowerCase();
     const matchSearch = !q || ev.title?.toLowerCase().includes(q) || ev.description?.toLowerCase().includes(q);
     const matchIndustry = !filterIndustry || ev.industry === filterIndustry;
-    return matchSearch && matchIndustry;
+    // Hide events whose date has already passed (events with no date are always shown)
+    const notPast = !ev.event_date || ev.event_date >= today;
+    return matchSearch && matchIndustry && notPast;
   });
 
   useEffect(() => {
@@ -254,7 +256,7 @@ export default function FeedPage() {
       try {
         const { ok, data } = await apiFetch("GET", `/user/${firebaseUser.uid}/sponsor-status`);
         if (ok) u.is_sponsor = data.is_sponsor;
-      } catch (_) {}
+      } catch (_) { }
       setUser(u);
       loadAll(firebaseUser.uid);
     });
