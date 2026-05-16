@@ -1,12 +1,8 @@
-# ── Secrets ────────────────────────────────────────────────
+# Secrets & credentials
 .env
-Myhack/pipelink/pipelink_backend/serviceAccountKey.json
-*.json
-!firebase.json
-!package.json
-!package-lock.json
+**/serviceAccountKey.json
 
-# ── Python ────────────────────────────────────────────────
+# Python
 __pycache__/
 *.py[cod]
 *.pyo
@@ -16,14 +12,21 @@ build/
 venv/
 .venv/
 
-# ── IDE ───────────────────────────────────────────────────
+# Node / Next.js
+node_modules/
+.next/
+out/
+
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# ── OS ────────────────────────────────────────────────────
+# OS
 .DS_Store
 Thumbs.db
 
+# Logs & temp
+*.log
